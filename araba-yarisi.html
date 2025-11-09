@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏎️ Araba Yarışı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D8E8 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #gameCanvas {
+            display: block;
+            margin: 20px auto;
+            background: #555;
+            border: 5px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #score {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #lives {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            display: none;
+        }
+        #gameOver h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff4444;
+        }
+        #gameOver p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        #gameOver button {
+            font-size: 24px;
+            padding: 15px 40px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #gameOver button:hover {
+            transform: scale(1.1);
+            background: #45a049;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Skor: 0</div>
+    <div id="lives">♾️ Sonsuz Can</div>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div id="controls">
+        ⬅️ Sol Ok | ➡️ Sağ Ok<br>
+        Engelleri geç, puan kazan!
+    </div>
+    <div id="gameOver">
+        <h1>🏁 Oyun Bitti!</h1>
+        <p id="finalScore">Skorunuz: 0</p>
+        <button onclick="restartGame()">🔄 Tekrar Oyna</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Oyun değişkenleri
+        let score = 0;
+        let gameSpeed = 3;
+        let gameRunning = true;
+        let lives = 10;
+        let invincible = false;
+        
+        // Oyuncu arabası
+        const player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 120,
+            width: 50,
+            height: 80,
+            speed: 5
+        };
+        
+        // Yol çizgileri
+        let roadLines = [];
+        for (let i = 0; i < 6; i++) {
+            roadLines.push({
+                x: canvas.width / 2 - 5,
+                y: i * 120,
+                width: 10,
+                height: 60
+            });
+        }
+        
+        // Düşman arabalar
+        let enemies = [];
+        
+        // Klavye kontrolleri
+        const keys = {};
+        window.addEventListener('keydown', (e) => keys[e.key] = true);
+        window.addEventListener('keyup', (e) => keys[e.key] = false);
+        
+        // Düşman araba oluştur
+        function createEnemy() {
+            const lanes = [75, 175, 275];
+            const lane = lanes[Math.floor(Math.random() * lanes.length)];
+            enemies.push({
+                x: lane - 25,
+                y: -100,
+                width: 50,
+                height: 80,
+                color: ['#ff0000', '#0000ff', '#ffff00', '#ff00ff'][Math.floor(Math.random() * 4)]
+            });
+        }
+        
+        // Araba çiz
+        function drawCar(x, y, width, height, color) {
+            // Gövde
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, width, height);
+            
+            // Cam
+            ctx.fillStyle = '#87CEEB';
+            ctx.fillRect(x + 10, y + 15, width - 20, 25);
+            
+            // Tekerlekler
+            ctx.fillStyle = '#000';
+            ctx.fillRect(x - 5, y + 10, 8, 15);
+            ctx.fillRect(x + width - 3, y + 10, 8, 15);
+            ctx.fillRect(x - 5, y + height - 25, 8, 15);
+            ctx.fillRect(x + width - 3, y + height - 25, 8, 15);
+        }
+        
+        // Çarpışma kontrolü
+        function checkCollision(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        // Oyun döngüsü
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Temizle
+            ctx.fillStyle = '#555';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Yol kenarları
+            ctx.fillStyle = '#2d5016';
+            ctx.fillRect(0, 0, 50, canvas.height);
+            ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
+            
+            // Yol çizgileri
+            ctx.fillStyle = '#fff';
+            roadLines.forEach(line => {
+                ctx.fillRect(line.x, line.y, line.width, line.height);
+                line.y += gameSpeed;
+                if (line.y > canvas.height) {
+                    line.y = -60;
+                }
+            });
+            
+            // Oyuncu hareketi
+            if (keys['ArrowLeft'] && player.x > 60) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] && player.x < canvas.width - player.width - 60) {
+                player.x += player.speed;
+            }
+            
+            // Oyuncu arabası çiz
+            drawCar(player.x, player.y, player.width, player.height, '#00ff00');
+            
+            // Düşman arabalar
+            enemies.forEach((enemy, index) => {
+                drawCar(enemy.x, enemy.y, enemy.width, enemy.height, enemy.color);
+                enemy.y += gameSpeed;
+                
+                // Çarpışma kontrolü (sonsuz can - sadece düşmanı sil)
+                if (checkCollision(player, enemy) && !invincible) {
+                    enemies.splice(index, 1);
+                    // 1 saniye dokunulmazlık
+                    invincible = true;
+                    setTimeout(() => invincible = false, 1000);
+                }
+                
+                // Ekrandan çıkan düşmanları sil ve puan ekle
+                if (enemy.y > canvas.height) {
+                    enemies.splice(index, 1);
+                    score += 10;
+                    document.getElementById('score').textContent = 'Skor: ' + score;
+                    
+                    // Hız artır
+                    if (score % 50 === 0) {
+                        gameSpeed += 0.5;
+                    }
+                }
+            });
+            
+            // Yeni düşman oluştur
+            if (Math.random() < 0.02) {
+                createEnemy();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Can güncelle
+        function updateLives() {
+            const hearts = '❤️ '.repeat(lives);
+            document.getElementById('lives').textContent = hearts || '💀';
+        }
+        
+        // Oyun bitti
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = 'Skorunuz: ' + score;
+            document.getElementById('gameOver').style.display = 'block';
+        }
+        
+        // Oyunu yeniden başlat
+        function restartGame() {
+            score = 0;
+            gameSpeed = 3;
+            gameRunning = true;
+            lives = 10;
+            invincible = false;
+            enemies = [];
+            player.x = canvas.width / 2 - 25;
+            document.getElementById('score').textContent = 'Skor: 0';
+            updateLives();
+            document.getElementById('gameOver').style.display = 'none';
+            gameLoop();
+        }
+        
+        // Oyunu başlat
+        gameLoop();
+    </script>
+</body>
+</html>
