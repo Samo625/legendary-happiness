@@ -3,247 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiro - Yapay Zeka Destekli Kod Editörü</title>
+    <title>Nöbet Listesi Oluşturucu</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-        }
-        .hero {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 100px 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><text x="10" y="50" font-size="40">💻</text></svg>') repeat;
-            opacity: 0.1;
-            animation: float 20s linear infinite;
-        }
-        @keyframes float {
-            from { transform: translateY(0); }
-            to { transform: translateY(-100px); }
-        }
-        .logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-        h1 {
-            font-size: 60px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-        .tagline {
-            font-size: 24px;
-            margin-bottom: 40px;
-            opacity: 0.9;
-            position: relative;
-            z-index: 1;
-        }
-        .download-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-        .btn {
-            padding: 15px 40px;
-            font-size: 18px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-primary {
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
             background: white;
-            color: #667eea;
-            font-weight: bold;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
         }
-        .btn-secondary {
-            background: rgba(255,255,255,0.2);
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #667eea;
             color: white;
-            border: 2px solid white;
         }
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
-        .features {
-            padding: 80px 20px;
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .list-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
             background: #f8f9fa;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
-        .section-title {
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
             text-align: center;
-            font-size: 48px;
-            margin-bottom: 60px;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
             color: #333;
         }
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
-        .feature-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-            text-align: center;
-        }
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-        .feature-icon {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-        .feature-title {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #667eea;
-        }
-        .feature-desc {
-            color: #666;
-            line-height: 1.6;
-        }
-        .screenshots {
-            padding: 80px 20px;
-            background: white;
-        }
-        .screenshot-grid {
-            display: flex;
-            gap: 20px;
-            overflow-x: auto;
-            padding: 20px 0;
-        }
-        .screenshot {
-            min-width: 300px;
-            height: 400px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 80px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .cta {
-            padding: 100px 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            text-align: center;
-        }
-        .cta h2 {
-            font-size: 48px;
-            margin-bottom: 30px;
-        }
-        footer {
-            background: #2d3748;
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <div class="logo">🚀</div>
-        <h1>Kiro</h1>
-        <p class="tagline">Yapay Zeka ile Kod Yazmak Hiç Bu Kadar Kolay Olmamıştı!</p>
-        <div class="download-buttons">
-            <a href="#" class="btn btn-primary">💻 Windows İndir</a>
-            <a href="#" class="btn btn-secondary">🍎 Mac İndir</a>
-            <a href="#" class="btn btn-secondary">🐧 Linux İndir</a>
+    <div class="container">
+        <h1>📋 Nöbet Listesi Oluşturucu</h1>
+        
+        <div class="form-section">
+            <div class="form-group">
+                <label for="personName">Kişi Adı:</label>
+                <input type="text" id="personName" placeholder="Örn: Ahmet Yılmaz">
+            </div>
+            
+            <div class="form-group">
+                <label for="dutyDate">Nöbet Tarihi:</label>
+                <input type="date" id="dutyDate">
+            </div>
+            
+            <div class="form-group">
+                <label for="dutyTime">Nöbet Saati:</label>
+                <select id="dutyTime">
+                    <option value="08:00-16:00">08:00 - 16:00 (Gündüz)</option>
+                    <option value="16:00-00:00">16:00 - 00:00 (Akşam)</option>
+                    <option value="00:00-08:00">00:00 - 08:00 (Gece)</option>
+                    <option value="08:00-20:00">08:00 - 20:00 (Uzun Gündüz)</option>
+                    <option value="20:00-08:00">20:00 - 08:00 (Uzun Gece)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Nöbet Yeri:</label>
+                <input type="text" id="location" placeholder="Örn: Acil Servis">
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="addDuty()">➕ Nöbet Ekle</button>
+                <button class="btn btn-success" onclick="showList()">📋 Listeyi Göster</button>
+                <button class="btn btn-secondary" onclick="clearAll()">🗑️ Tümünü Temizle</button>
+            </div>
         </div>
-    </div>
 
-    <div class="features">
-        <div class="container">
-            <h2 class="section-title">✨ Özellikler</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3 class="feature-title">Yapay Zeka Asistanı</h3>
-                    <p class="feature-desc">Kodlarınızı yazarken size yardımcı olan akıllı AI asistanı. Sorularınızı sorun, anında cevap alın!</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3 class="feature-title">Hızlı ve Güçlü</h3>
-                    <p class="feature-desc">Büyük projelerde bile hızlı çalışır. Saniyeler içinde kod yazın ve test edin!</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎨</div>
-                    <h3 class="feature-title">Modern Tasarım</h3>
-                    <p class="feature-desc">Göz yormayan, şık ve kullanıcı dostu arayüz. Kodlamayı seveceksiniz!</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔧</div>
-                    <h3 class="feature-title">Tüm Diller</h3>
-                    <p class="feature-desc">Python, JavaScript, Java, C++, HTML, CSS ve daha fazlası! Tüm dilleri destekler.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
-                    <h3 class="feature-title">Türkçe Destek</h3>
-                    <p class="feature-desc">Tamamen Türkçe arayüz ve Türkçe AI asistanı. Anadilinde kod öğrenin!</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎓</div>
-                    <h3 class="feature-title">Öğrenme Modu</h3>
-                    <p class="feature-desc">Yeni başlıyorsanız endişelenmeyin! Adım adım öğrenme rehberi ile başlayın.</p>
-                </div>
+        <div class="list-section" id="listSection">
+            <h2>Nöbet Listesi</h2>
+            <table id="dutyTable">
+                <thead>
+                    <tr>
+                        <th>Sıra</th>
+                        <th>Kişi Adı</th>
+                        <th>Tarih</th>
+                        <th>Saat</th>
+                        <th>Yer</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="dutyTableBody">
+                </tbody>
+            </table>
+            
+            <div class="button-group">
+                <button class="btn btn-success" onclick="askExportToExcel()">📊 E-Tablo'ya Aktar</button>
             </div>
         </div>
     </div>
 
-    <div class="screenshots">
-        <div class="container">
-            <h2 class="section-title">📸 Ekran Görüntüleri</h2>
-            <div class="screenshot-grid">
-                <div class="screenshot">💻</div>
-                <div class="screenshot">🎨</div>
-                <div class="screenshot">⚡</div>
-                <div class="screenshot">🚀</div>
+    <!-- Modal -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h2>E-Tablo'ya Aktarılsın mı?</h2>
+            <p>Nöbet listesini Excel dosyası olarak indirmek istiyor musunuz?</p>
+            <div class="button-group">
+                <button class="btn btn-success" onclick="exportToExcel()">✅ Evet</button>
+                <button class="btn btn-danger" onclick="closeModal()">❌ Hayır</button>
             </div>
         </div>
     </div>
 
-    <div class="cta">
-        <h2>Hemen İndirin ve Başlayın!</h2>
-        <p style="font-size: 20px; margin-bottom: 30px;">Ücretsiz deneme sürümü ile tüm özellikleri keşfedin</p>
-        <a href="#" class="btn btn-primary" style="font-size: 20px; padding: 20px 50px;">🎉 Şimdi İndir</a>
-    </div>
+    <script>
+        let duties = [];
 
-    <footer>
-        <p>&copy; 2024 Kiro - Tüm hakları saklıdır</p>
-        <p style="margin-top: 10px; opacity: 0.7;">Yapay zeka destekli kod editörü</p>
-    </footer>
+        function addDuty() {
+            const name = document.getElementById('personName').value.trim();
+            const date = document.getElementById('dutyDate').value;
+            const time = document.getElementById('dutyTime').value;
+            const location = document.getElementById('location').value.trim();
+
+            if (!name || !date || !location) {
+                alert('⚠️ Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            const duty = {
+                id: Date.now(),
+                name: name,
+                date: date,
+                time: time,
+                location: location
+            };
+
+            duties.push(duty);
+            
+            // Formu temizle
+            document.getElementById('personName').value = '';
+            document.getElementById('dutyDate').value = '';
+            document.getElementById('location').value = '';
+            
+            alert('✅ Nöbet başarıyla eklendi!');
+        }
+
+        function showList() {
+            if (duties.length === 0) {
+                alert('⚠️ Henüz nöbet eklenmedi!');
+                return;
+            }
+
+            const tbody = document.getElementById('dutyTableBody');
+            tbody.innerHTML = '';
+
+            duties.forEach((duty, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${duty.name}</td>
+                    <td>${formatDate(duty.date)}</td>
+                    <td>${duty.time}</td>
+                    <td>${duty.location}</td>
+                    <td><button class="btn btn-danger" onclick="deleteDuty(${duty.id})">🗑️ Sil</button></td>
+                `;
+            });
+
+            document.getElementById('listSection').style.display = 'block';
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('tr-TR', options);
+        }
+
+        function deleteDuty(id) {
+            if (confirm('Bu nöbeti silmek istediğinizden emin misiniz?')) {
+                duties = duties.filter(duty => duty.id !== id);
+                showList();
+                if (duties.length === 0) {
+                    document.getElementById('listSection').style.display = 'none';
+                }
+            }
+        }
+
+        function clearAll() {
+            if (duties.length === 0) {
+                alert('⚠️ Zaten liste boş!');
+                return;
+            }
+            
+            if (confirm('Tüm nöbetleri silmek istediğinizden emin misiniz?')) {
+                duties = [];
+                document.getElementById('listSection').style.display = 'none';
+                alert('✅ Tüm nöbetler silindi!');
+            }
+        }
+
+        function askExportToExcel() {
+            document.getElementById('exportModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('exportModal').style.display = 'none';
+            alert('❌ E-Tablo\'ya aktarma iptal edildi.');
+        }
+
+        function exportToExcel() {
+            document.getElementById('exportModal').style.display = 'none';
+
+            // CSV formatında veri hazırla
+            let csv = '\uFEFF'; // UTF-8 BOM for Turkish characters
+            csv += 'Sıra,Kişi Adı,Tarih,Saat,Yer\n';
+
+            duties.forEach((duty, index) => {
+                csv += `${index + 1},"${duty.name}","${formatDate(duty.date)}","${duty.time}","${duty.location}"\n`;
+            });
+
+            // Blob oluştur ve indir
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Nobet_Listesi_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            alert('✅ Nöbet listesi E-Tablo dosyası olarak indirildi!');
+        }
+
+        // Bugünün tarihini varsayılan olarak ayarla
+        document.getElementById('dutyDate').valueAsDate = new Date();
+    </script>
 </body>
 </html>
